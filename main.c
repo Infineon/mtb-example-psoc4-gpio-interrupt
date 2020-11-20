@@ -1,11 +1,8 @@
 /******************************************************************************
 * File Name: main.c
 *
-* Version 1.0
-*
-* Description:
-*  This code example demonstrates the use of GPIO configured as an input pin to
-*  generate interrupts in PSoC 4.
+* Description: This code example demonstrates the use of GPIO configured as an
+*              input pin to generate interrupts in PSoC 4.
 *
 * Related Document: See readme.md
 *
@@ -114,7 +111,7 @@ int main(void)
 {
     cy_rslt_t result;
     uint32_t count = 0;
-    uint32_t delayMs = DELAY_SHORT;
+    uint32_t delayMs = DELAY_LONG;
 
     /* Initialize the device and board peripherals */
     result = cybsp_init() ;
@@ -150,16 +147,20 @@ int main(void)
             {
                 delayMs = DELAY_LONG;
             }
-
-            /* Blink LED four times */
-            for (count = 0; count < LED_BLINK_COUNT; count++)
-            {
-                Cy_GPIO_Write(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM, LED_ON);
-                Cy_SysLib_Delay(delayMs);
-                Cy_GPIO_Write(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM, LED_OFF);
-                Cy_SysLib_Delay(delayMs);
-            }
         }
+
+		/* Blink LED four times */
+		for (count = 0; count < LED_BLINK_COUNT; count++)
+		{
+			Cy_GPIO_Write(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM, LED_ON);
+			Cy_SysLib_Delay(delayMs);
+			Cy_GPIO_Write(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM, LED_OFF);
+			Cy_SysLib_Delay(delayMs);
+		}
+
+		/* Enter deep sleep mode */
+		Cy_SysPm_CpuEnterDeepSleep();
+
     }
 }
 

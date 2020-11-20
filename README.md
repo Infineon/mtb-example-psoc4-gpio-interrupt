@@ -1,27 +1,37 @@
 # PSoC 4: GPIO Interrupt
 
-**Alpha Release Content** - Support for PSoC 4 family devices on ModusToolbox is currently in alpha stage. Features may change without notice. Contact [Cypress Support](https://www.cypress.com/support) for additional details.
+This code example demonstrates the use of a GPIO configured as an input pin to generate interrupts on PSoC® 4.
+The GPIO signal interrupts the CPU and executes a user-defined Interrupt Service Routine (ISR). The GPIO interrupt acts as a wakeup source to wake the CPU from Deep Sleep.
 
-This code example demonstrates the use of a GPIO configured as an input pin to generate interrupts on PSoC® 4. 
-The GPIO signal interrupts the CPU and executes a user-defined Interrupt Service Routine (ISR).
+[Provide feedback on this Code Example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMzA2NTQiLCJTcGVjIE51bWJlciI6IjAwMi0zMDY1NCIsIkRvYyBUaXRsZSI6IlBTb0MgNDogR1BJTyBJbnRlcnJ1cHQiLCJyaWQiOiJhc3NpIiwiRG9jIHZlcnNpb24iOiIyLjAuMCIsIkRvYyBMYW5ndWFnZSI6IkVuZ2xpc2giLCJEb2MgRGl2aXNpb24iOiJNQ0QiLCJEb2MgQlUiOiJJQ1ciLCJEb2MgRmFtaWx5IjoiUFNPQyJ9)
 
 ## Requirements
 
-- [ModusToolbox™ software](https://www.cypress.com/products/modustoolbox-software-environment) v2.1
+- [ModusToolbox® software](https://www.cypress.com/products/modustoolbox-software-environment) v2.2
+
+  **Note:** This code example version requires ModusToolbox software version 2.2 or later and is not backward compatible with v2.1 or older versions. 
+
+- Board Support Package (BSP) minimum required version: 2.0.0
 - Programming Language: C
-- Associated Parts: [PSoC® 4 S-Series](http://www.cypress.com/PSoC4) parts
+- Associated Parts: [PSoC 4000S](https://www.cypress.com/documentation/datasheets/psoc-4-psoc-4000s-family-datasheet-programmable-system-chip-psoc), [PSoC 4100S](https://www.cypress.com/documentation/datasheets/psoc-4-psoc-4100s-family-datasheet-programmable-system-chip-psoc), and [PSoC 4100S Plus](https://www.cypress.com/documentation/datasheets/psoc-4-psoc-4100s-plus-datasheet-programmable-system-chip-psoc)
 
-## Supported Kits
+## Supported Toolchains (make variable 'TOOLCHAIN')
 
-- [ PSoC® 4100S Plus Prototyping Kit ](https://www.cypress.com/CY8CKIT-149) (CY8CKIT-149) - Default target
+- GNU Arm® Embedded Compiler v9.3.1 (`GCC_ARM`) - Default value of `TOOLCHAIN`
+- Arm compiler v6.11 (`ARM`)
+- IAR C/C++ compiler v8.42.2 (`IAR`)
+
+## Supported Kits (make variable 'TARGET')
+
+- [PSoC 4000S CapSense Prototyping Kit](https://www.cypress.com/CY8CKIT-145-40xx) (`CY8CKIT-145-40XX`) - Default value of `TARGET`
+- [PSoC 4100S Plus Prototyping Kit](https://www.cypress.com/CY8CKIT-149) (`CY8CKIT-149`)
+- [PSoC 4100S CapSense Pioneer Kit](https://www.cypress.com/CY8CKIT-041-41xx) (`CY8CKIT-041-41XX`)
 
 ## Hardware Setup
 
 This example uses the board's default configuration. Refer to the kit user guide to ensure that the board is configured correctly.
 
-**Note**: The PSoC 4 S-Series kits ship with KitProg2 installed. ModusToolbox software requires KitProg3. Before using this code example, make sure that the board is upgraded to KitProg3. 
-The tool and instructions are available in the [Firmware Loader](https://github.com/cypresssemiconductorco/Firmware-loader) GitHub repository. 
-If you do not upgrade, you will see an error like "unable to find CMSIS-DAP device" or "KitProg firmware is out of date".
+**Note:** The PSoC 4 S-Series kits ship with KitProg2 installed. ModusToolbox software requires KitProg3. Before using this code example, make sure that the board is upgraded to KitProg3. The tool and instructions are available in the [Firmware Loader](https://github.com/cypresssemiconductorco/Firmware-loader) GitHub repository. If you do not upgrade, you will see an error like "unable to find CMSIS-DAP device" or "KitProg firmware is out of date".
 
 ## Software Setup
 
@@ -31,92 +41,105 @@ This example requires no additional software or tools.
 
 ### In Eclipse IDE for ModusToolbox:
 
-1. Click the **New Application** link in the Quick Panel (or, use **File** > **New** > **ModusToolbox Application**).
+1. Click the **New Application** link in the Quick Panel (or, use **File** > **New** > **ModusToolbox Application**). This launches the [Project Creator](http://www.cypress.com/ModusToolboxProjectCreator) tool.
 
 2. Pick a kit supported by the code example from the list shown in the **Project Creator - Choose Board Support Package (BSP)** dialog.
 
-   When you select a supported kit, the example is reconfigured automatically to work with the kit. To work with a different supported kit later, use the **Library Manager** to choose the BSP for the supported kit. You can use the Library Manager to select or update the BSP and firmware libraries used in this application. 
-   
-   To access the Library Manager, right-click the application name from the Project Workspace window in the IDE, and select **ModusToolbox** > **Library Manager** (or select it from the **Quick Panel**).
+   When you select a supported kit, the example is reconfigured automatically to work with the kit. To work with a different supported kit later, use the [Library Manager](https://www.cypress.com/ModusToolboxLibraryManager) to choose the BSP for the supported kit. You can use the Library Manager to select or update the BSP and firmware libraries used in this application. To access the Library Manager, click the link from the **Quick Panel**.
 
    You can also just start the application creation process again and select a different kit.
 
    If you want to use the application for a kit not listed here, you may need to update the source files. If the kit does not have the required resources, the application may not work.
-   
-3. In the **Project Creator - Choose Board Support Package (BSP)** dialog, choose the example.
 
-4. Optionally, update the **Application Name** and **Location** fields with the application name and local path where the application is created.
+3. In the **Project Creator - Select Application** dialog, choose the example by enabling the checkbox.
 
-5. Click **Create** to complete the application creation process.
+4. Optionally, change the suggested **New Application Name**.
 
-For more details, see the Eclipse IDE for ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mt_ide_user_guide.pdf*.
+5. Enter the local path in the **Application(s) Root Path** field to indicate where the application needs to be created.
+
+   Applications that can share libraries can be placed in the same root path.
+
+6. Click **Create** to complete the application creation process.
+
+For more details, see the [Eclipse IDE for ModusToolbox User Guide](https://www.cypress.com/MTBEclipseIDEUserGuide) (locally available at *{ModusToolbox install directory}/ide_{version}/docs/mt_ide_user_guide.pdf*).
 
 ### In Command-line Interface (CLI):
 
+ModusToolbox provides the Project Creator as both a GUI tool and a command line tool to easily create one or more ModusToolbox applications. See the "Project Creator Tools" section of the [ModusToolbox User Guide](https://www.cypress.com/ModusToolboxUserGuide) for more details.
+
+Alternatively, you can manually create the application using the following steps.
+
 1. Download and unzip this repository onto your local machine, or clone the repository.
 
-2. Open a CLI terminal and navigate to the application folder. 
+2. Open a CLI terminal and navigate to the application folder.
 
-   On Linux and macOS, you can use any terminal application. On Windows, navigate to the modus-shell directory (*{ModusToolbox install directory}/tools_\<version>/modus-shell*) and run *Cygwin.bat*.
+   On Linux and macOS, you can use any terminal application. On Windows, open the **modus-shell** app from the Start menu.
+
+   **Note:** The cloned application contains a default BSP file (*TARGET_xxx.mtb*) in the *deps* folder. Use the [Library Manager](https://www.cypress.com/ModusToolboxLibraryManager) (`make modlibs` command) to select and download a different BSP file, if required. If the selected kit does not have the required resources or is not [supported](#supported-kits-make-variable-target), the application may not work.
 
 3. Import the required libraries by executing the `make getlibs` command.
 
+Various CLI tools include a `-h` option that prints help information to the terminal screen about that tool. For more details, see the [ModusToolbox User Guide](https://www.cypress.com/ModusToolboxUserGuide) (locally available at *{ModusToolbox install directory}/docs_{version}/mtb_user_guide.pdf*).
+
 ### In Third-party IDEs:
 
-1. Follow the instructions from the [CLI](#in-command-line-interface-cli) section to download or clone the repository, and import the libraries using the `make getlibs` command.
+1. Follow the instructions from the [CLI](#in-command-line-interface-cli) section to create the application, and import the libraries using the `make getlibs` command.
+
+   For a list of supported IDEs and more details, see the "Exporting to IDEs" section of the [ModusToolbox User Guide](https://www.cypress.com/ModusToolboxUserGuide) (locally available at *{ModusToolbox install directory}/docs_{version}/mtb_user_guide.pdf*.
 
 2. Export the application to a supported IDE using the `make <ide>` command.
 
 3. Follow the instructions displayed in the terminal to create or import the application as an IDE project.
 
-For more details, see the "Exporting to IDEs" section of the ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mtb_user_guide.pdf*.
-
 ## Operation
 
-1. Connect the kit to your PC using the provided USB cable.
+1. Connect the kit to your PC using the provided USB cable through the KitProg3 USB connector.
 
 2. Program the board.
 
    **Using Eclipse IDE for ModusToolbox:**
 
    1. Select the application project in the Project Explorer.
-   
+
    2. In the **Quick Panel**, scroll down, and click **GPIO_Interrupt Program (KitProg3)**.
 
    **Using CLI:**
 
    From the terminal, execute the `make program` command to build and program the application using the default toolchain to the default target. You can specify a target and toolchain manually:
-        
+
 	```
    make program TARGET=<BSP> TOOLCHAIN=<toolchain>
-   ```   
+   ```
    Example:
 
    ```
-   make program TARGET=CY8CKIT-149 TOOLCHAIN=GCC_ARM
+   make program TARGET=CY8CKIT-145-40XX TOOLCHAIN=GCC_ARM
    ```
-   After programming, the application starts automatically. 
+   After programming, the application starts automatically.
 
-3. Press the user switch to trigger an interrupt. Observe that the LED blinks four times and then turns OFF.
+3. Observe that the LED blinks four times and then turns OFF, indicating that the CPU has entered Deep Sleep.
 
-   Confirm that the kit LED blinks at 1 Hz (approximately).
+4. Press the user button to trigger an interrupt. This should wake up the device, causing the LED to resume blinking at a faster rate (default = 2 Hz). The faster blink rate indicates that the ISR has executed to change the delay variable used to determine the LED blink rate. The LED blinks four times and the device enters Deep Sleep again.
 
-4. Pressing the switch again should cause the LED to resume blinking at a new interval (the faster blink rate to indicate that the ISR has executed). 
+5. Press the button again to repeat the wakeup cycle. The LED resumes blinking at a slower rate (default = 1 Hz). With every interrupt and execution of the ISR, the interval of blinking is alternated between slower and faster rates.
 
-   The LED blinks for four times and then turns OFF.
-
-5. Press the switch again to repeat the cycle. 
-
-   The LED resumes blinking with the original interval of 1 second. With every interrupt and execution of ISR, the interval of blinking is alternated between 1 second and 500 milliseconds.
+**Note:** The LED states are inverted for the CY8CKIT-149 kit.
 
 ## Debugging
 
-You can debug the example to step through the code. In the IDE, use the **GPIO_Interrupt Debug (KitProg3)** configuration in the **Quick Panel**.
+You can debug the example to step through the code. In the IDE, use the **\<Application Name> Debug (KitProg3_MiniProg4)** configuration in the **Quick Panel**. For more details, see the "Program and Debug" section in the [Eclipse IDE for ModusToolbox User Guide](https://www.cypress.com/MTBEclipseIDEUserGuide).
 
 ## Design and Implementation
 
-This code example demonstrates the implementation of a GPIO interrupt. An LED is connected to an output pin; it
-is used for indicating the occurrence of the GPIO Interrupt. A blinking LED indicates that the interrupt has occurred. After four successive blinks, the LED goes OFF. An input pin, externally connected to a switch, is configured to generate an interrupt when the switch is pressed. The interrupt triggers the execution of an ISR. When the ISR is executed, a flag is updated, which is used to change the rate of blinking the LED. With every press of the switch, the LED alternates blinking in the intervals of 500 milliseconds and 1 second.
+This code example uses a GPIO interrupt to wake the CPU from Deep Sleep. An LED is connected to an output pin; it is used for indicating the current state of the CPU. A blinking LED indicates that the CPU is active. After four successive blinks, the CPU is instructed to enter Deep Sleep. The GPIO state is retained during Deep Sleep, so the LED stops blinking and stays OFF to indicate that the CPU is in Deep Sleep.
+
+An input pin, externally connected to a switch, is configured to generate an interrupt when the switch is pressed. The interrupt triggers the following two actions:
+
+1. Generates a signal that wakes the CPU from Deep Sleep
+
+2. Executes an ISR
+
+When the ISR is executed, a flag is updated, which is used to change the rate of blinking the LED. With every press of the switch, the LED alternates the blinking interval.
 
 ### Resources and Settings
 
@@ -125,7 +148,7 @@ is used for indicating the occurrence of the GPIO Interrupt. A blinking LED indi
 | Resource      |  Alias/Object          |    Purpose     |
 | :-------      | :------------          | :------------  |
 | LED (BSP)     | CYBSP_USER_LED1        | User LED to show the output              |
-| Switch (BSP)  | CYBSP_SW1              | User switch to generate the  interrupt   |
+| Switch (BSP)  | CYBSP_USER_BTN         | User switch to generate the interrupt   |
 
 ## Related Resources
 
@@ -133,15 +156,21 @@ is used for indicating the occurrence of the GPIO Interrupt. A blinking LED indi
 | :----------------------------------------------------------- | :----------------------------------------------------------- |
 | [AN79953](https://www.cypress.com/AN79953) – Getting Started with PSoC® 4 | Describes PSoC 4 devices and how to build your first application with PSoC Creator |
 **Device Documentation**                                     |                                                              |
-| [PSoC 4 Datasheets](https://www.cypress.com/search/all/PSOC%204%20datasheets?sort_by=search_api_relevance&f%5B0%5D=meta_type%3Atechnical_documents) | 
+| [PSoC 4 Datasheets](https://www.cypress.com/search/all/PSOC%204%20datasheets?sort_by=search_api_relevance&f%5B0%5D=meta_type%3Atechnical_documents) |
 | [PSoC 4 Technical Reference Manuals](https://www.cypress.com/search/all/PSoC%204%20Technical%20Reference%20Manual?sort_by=search_api_relevance&f%5B0%5D=meta_type%3Atechnical_documents) |
 | **Code Examples**                                            |                                                              |
 | [Using ModusToolbox](https://github.com/cypresssemiconductorco/Code-Examples-for-ModusToolbox-Software) |
-| **Development Kits**                                         | Buy at Cypress.com                                     |
-| [CY8CKIT-149](https://www.cypress.com/CY8CKIT-149) PSoC® 4100S Plus Prototyping Kit | 
+| [Using PSoC Creator](https://www.cypress.com/documentation/code-examples/psoc-345-code-examples)|
+| **Development Kits**                                         | Buy at www.cypress.com                                     |
+| [CY8CKIT-149](https://www.cypress.com/CY8CKIT-149) PSoC® 4100S Plus Prototyping Kit |
+| [CY8CKIT-145](https://www.cypress.com/CY8CKIT-145) PSoC® 4000S CapSense Prototyping Kit |
+| [CY8CKIT-041-41xx](https://www.cypress.com/CY8CKIT-149) PSoC® 4100S CapSense Pioneer Kit|
+| **Libraries**                                                 |                                                             |
+| PSoC 4 Peripheral Driver Library (PDL) and docs  | [mtb-pdl-cat2](https://github.com/cypresssemiconductorco/mtb-pdl-cat2) on GitHub |
+| Cypress Hardware Abstraction Layer (HAL) Library and docs     | [mtb-hal-cat2](https://github.com/cypresssemiconductorco/mtb-hal-cat2) on GitHub |
 | **Tools**                                                    |                                                              |
-| [Eclipse IDE for ModusToolbox](https://www.cypress.com/modustoolbox)     | The multi-platform, Eclipse-based Integrated Development Environment (IDE) that supports application configuration and development for PSoC 6 MCU and PSoC 4.       |
-| [PSoC Creator](https://www.cypress.com/products/psoc-creator-integrated-design-environment-ide) | The Cypress IDE for PSoC and FM0+ MCU development.            |
+| [Eclipse IDE for ModusToolbox](https://www.cypress.com/modustoolbox)     | The cross-platform, Eclipse-based IDE for IoT designers that supports application configuration and development targeting converged MCU and wireless systems.             |
+| [PSoC Creator™](https://www.cypress.com/products/psoc-creator-integrated-design-environment-ide) | The Cypress IDE for PSoC and FM0+ MCU development.            |
 
 
 ## Other Resources
@@ -150,11 +179,12 @@ Cypress provides a wealth of data at www.cypress.com to help you select the righ
 
 ## Document History
 
-Document Title: *CE230654 - PSoC 4: GPIO Interrupt*
+Document Title: *CE230654* - *PSoC 4: GPIO Interrupt*
 
 | Version | Description of Change |
 | ------- | --------------------- |
 | 1.0.0   | New code example      |
+| 2.0.0   | Major update to support ModusToolbox software v2.2, added support for new kits.<br /> This version is not backward compatible with ModusToolbox software v2.1.  |
 
 ------
 
