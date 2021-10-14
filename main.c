@@ -1,28 +1,30 @@
 /******************************************************************************
-* File Name: main.c
+* File Name:   main.c
 *
 * Description: This code example demonstrates the use of GPIO configured as an
 *              input pin to generate interrupts in PSoC 4.
 *
-* Related Document: See readme.md
+* Related Document: See README.md
+*
 *
 *******************************************************************************
-* (c) 2020, Cypress Semiconductor Corporation. All rights reserved.
-*******************************************************************************
-* This software, including source code, documentation and related materials
-* ("Software"), is owned by Cypress Semiconductor Corporation or one of its
-* subsidiaries ("Cypress") and is protected by and subject to worldwide patent
-* protection (United States and foreign), United States copyright laws and
-* international treaty provisions. Therefore, you may use this Software only
-* as provided in the license agreement accompanying the software package from
-* which you obtained this Software ("EULA").
+* Copyright 2020-2021, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
+* This software, including source code, documentation and related
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
+* worldwide patent protection (United States and foreign),
+* United States copyright laws and international treaty provisions.
+* Therefore, you may use this Software only as provided in the license
+* agreement accompanying the software package from which you
+* obtained this Software ("EULA").
 * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
-* non-transferable license to copy, modify, and compile the Software source
-* code solely for use in connection with Cypress's integrated circuit products.
-* Any reproduction, modification, translation, compilation, or representation
-* of this Software except as specified above is prohibited without the express
-* written permission of Cypress.
+* non-transferable license to copy, modify, and compile the Software
+* source code solely for use in connection with Cypress's
+* integrated circuit products.  Any reproduction, modification, translation,
+* compilation, or representation of this Software except as specified
+* above is prohibited without the express written permission of Cypress.
 *
 * Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
@@ -33,15 +35,16 @@
 * not authorize its products for use in any products where a malfunction or
 * failure of the Cypress product may reasonably be expected to result in
 * significant property damage, injury or death ("High Risk Product"). By
-* including Cypress's product in a High Risk Product, the manufacturer of such
-* system or application assumes all risk of such use and in doing so agrees to
-* indemnify Cypress against all liability.
+* including Cypress's product in a High Risk Product, the manufacturer
+* of such system or application assumes all risk of such use and in doing
+* so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
 
-/* Header file includes */
+/******************************************************************************
+ * Header file includes
+ *****************************************************************************/
 #include "cy_pdl.h"
 #include "cybsp.h"
-#include "cycfg_pins.h"
 
 
 /******************************************************************************
@@ -51,9 +54,6 @@
 #define DELAY_LONG              (500)   /* milliseconds */
 
 #define LED_BLINK_COUNT         (4)
-
-#define LED_ON                  (0)
-#define LED_OFF                 (1)
 
 #define SWITCH_INTR_PRIORITY    (3u)
 
@@ -129,8 +129,33 @@ int main(void)
     {
         CY_ASSERT(0);
     }
+
+    /* Clearing and enabling the GPIO interrupt in NVIC */
     NVIC_ClearPendingIRQ(switch_intr_config.intrSrc);
     NVIC_EnableIRQ(switch_intr_config.intrSrc);
+
+    cy_stc_sysclk_context_t sysClkContext;
+
+    cy_stc_syspm_callback_params_t sysClkCallbackParams =
+    {
+        .base       = NULL,
+        .context    = (void*)&sysClkContext
+    };
+
+    /* Callback declaration for Deep Sleep mode */
+    cy_stc_syspm_callback_t sysClkCallback =
+    {
+        .callback       = &Cy_SysClk_DeepSleepCallback,
+        .type           = CY_SYSPM_DEEPSLEEP,
+        .skipMode       = 0UL,
+        .callbackParams = &sysClkCallbackParams,
+        .prevItm        = NULL,
+        .nextItm        = NULL,
+        .order          = 0
+    };
+
+    /* Register Deep Sleep callback */
+    Cy_SysPm_RegisterCallback(&sysClkCallback);
 
     for (;;)
     {
@@ -149,17 +174,17 @@ int main(void)
             }
         }
 
-		/* Blink LED four times */
-		for (count = 0; count < LED_BLINK_COUNT; count++)
-		{
-			Cy_GPIO_Write(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM, LED_ON);
-			Cy_SysLib_Delay(delayMs);
-			Cy_GPIO_Write(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM, LED_OFF);
-			Cy_SysLib_Delay(delayMs);
-		}
+        /* Blink LED four times */
+        for (count = 0; count < LED_BLINK_COUNT; count++)
+        {
+            Cy_GPIO_Inv(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM);
+            Cy_SysLib_Delay(delayMs);
+            Cy_GPIO_Inv(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM);
+            Cy_SysLib_Delay(delayMs);
+        }
 
-		/* Enter deep sleep mode */
-		Cy_SysPm_CpuEnterDeepSleep();
+        /* Enter deep sleep mode */
+        Cy_SysPm_CpuEnterDeepSleep();
 
     }
 }

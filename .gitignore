@@ -12,7 +12,7 @@ libs/
 
 # Eclipse IDE for ModusToolbox files
 .metadata/
-.cyignore
+# .cyignore
 # .settings/
 # .cproject
 # .project
