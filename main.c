@@ -4,11 +4,11 @@
 * Description: This code example demonstrates the use of GPIO configured as an
 *              input pin to generate interrupts in PSoC 4.
 *
-* Related Document: See README.md
+* Related Document: See README.md 
 *
 *
 *******************************************************************************
-* Copyright 2020-2023, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2020-2024, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
